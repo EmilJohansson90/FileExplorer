@@ -1,12 +1,6 @@
 ﻿using System;
+using FileExplorer;
 
-namespace FileExplorer
-{
-    class Program
-    {
-        static void Main(string[] args)
-        {
-            Console.WriteLine("Hello World!");
-        }
-    }
-}
+ConsoleExplorer explorer = new ConsoleExplorer();
+explorer.Run();
+
