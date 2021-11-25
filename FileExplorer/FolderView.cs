@@ -9,10 +9,12 @@ namespace FileExplorer
 {
     class FolderView : ConsoleExplorer
     {
+        private string _currentFileName;
+
         public void ListInventory()
         {
             while (true)
-            {
+            {                
                 Console.Clear();
                 string[] fileArray = Directory.GetFileSystemEntries(".");
 
@@ -46,17 +48,19 @@ namespace FileExplorer
                 else if (input == ConsoleKey.UpArrow && _indexNumber > 0)
                 {
                     Up();
+                } else if(input == ConsoleKey.Spacebar)
+                {
+                    _viewState = ViewState.FileView;
                 }
             }
         }
 
-        public void Up()
+        public string CurrentFileName
         {
-            _indexNumber--;
-        }
-        public void Down()
-        {
-            _indexNumber++;
+            get
+            {
+                return _currentFileName;
+            }
         }
     }
 }
