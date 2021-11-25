@@ -9,51 +9,106 @@ namespace FileExplorer
 {
     class FolderView : ConsoleExplorer
     {
+        private string _currentPath = Path.GetFullPath(".");
         private string _currentFileName;
+        private string[] _fileArray;
 
         public void ListInventory()
         {
             while (true)
-            {                
+            {
                 Console.Clear();
-                string[] fileArray = Directory.GetFileSystemEntries(".");
-
-                for (int i = 0; i < fileArray.Length; i++)
+                if (_viewState == ViewState.List)
                 {
-                    if(_indexNumber == i)
-                    {
-                        Console.BackgroundColor = ConsoleColor.DarkGray;
-                        Console.ForegroundColor = ConsoleColor.Black;
-                    }                   
-
-                    if (File.Exists(fileArray[i]))
-                    {
-                        Console.WriteLine($"- {Path.GetFileName(fileArray[i])}");
-                    }
-                    else if (Directory.Exists(fileArray[i]))
-                    {
-                        Console.WriteLine($"# {Path.GetFileName(fileArray[i])}");
-                    }
-
-                    Console.BackgroundColor = ConsoleColor.Black;
-                    Console.ForegroundColor = ConsoleColor.White;
-
+                    ListFolder(_currentPath);
                 }
-
-                ConsoleKey input = Console.ReadKey().Key;
-                if (input == ConsoleKey.DownArrow && _indexNumber < fileArray.Length)
+                else
                 {
-                    Down();
-                }
-                else if (input == ConsoleKey.UpArrow && _indexNumber > 0)
-                {
-                    Up();
-                } else if(input == ConsoleKey.Spacebar)
-                {
-                    _viewState = ViewState.FileView;
+                    WriteFile();
                 }
             }
         }
+        private void ListFolder(string currentPath)
+        {
+            ColorEdit colorEdit = new ColorEdit();
+            _fileArray = Directory.GetFileSystemEntries(currentPath);
+
+            if (_indexNumber >= _fileArray.Length) { _indexNumber = _fileArray.Length - 1; }
+            if (_indexNumber < 0) { _indexNumber = 0; }
+
+            for (int i = 0; i < _fileArray.Length; i++)
+            {
+                if (_indexNumber == i) { colorEdit.ChangeColor(ConsoleColor.Black, ConsoleColor.DarkGray); }
+
+                if (File.Exists(_fileArray[i]))
+                {
+                    Console.WriteLine($"- {Path.GetFileName(_fileArray[i])}");
+                }
+                else if (Directory.Exists(_fileArray[i]))
+                {
+                    Console.WriteLine($"# {Path.GetFileName(_fileArray[i])}");
+                }
+
+                colorEdit.ChangeColor(ConsoleColor.White, ConsoleColor.Black);
+
+                _currentFileName = Path.GetFileName(_fileArray[_indexNumber]);
+            }
+
+            Console.WriteLine("\n-----------------------------------------\n" +
+                "Press backspace to return previous folder.");
+            Navigate();
+        }
+
+        private void WriteFile()
+        {
+            string fileOutput = File.ReadAllText($"{_currentPath}\\{_currentFileName}");
+            Console.WriteLine($"{fileOutput}\n\n" +
+                $"----------------------------------\n" +
+                $"Press any key to return to folder.");
+
+            Console.ReadKey();
+            _viewState = ViewState.List;
+        }
+
+        public void CheckFile(string filePath)
+        {
+            if (Directory.Exists(filePath))
+            {
+                _currentPath = filePath;
+            }
+            else
+            {
+                Console.Clear();
+                WriteFile();
+            }
+        }
+
+        public void Navigate()
+        {
+            ConsoleKey input = Console.ReadKey().Key;
+            switch (input)
+            {
+                case ConsoleKey.DownArrow:
+                    Down();
+                    break;
+
+                case ConsoleKey.UpArrow:
+                    Up();
+                    break;
+
+                case ConsoleKey.Spacebar:
+                    CheckFile($"{_currentPath}\\{_currentFileName}");
+                    break;
+
+                case ConsoleKey.Backspace:
+                    _currentPath = Convert.ToString(Directory.GetParent(_currentPath));
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
 
         public string CurrentFileName
         {
