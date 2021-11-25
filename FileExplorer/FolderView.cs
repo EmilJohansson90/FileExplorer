@@ -18,16 +18,11 @@ namespace FileExplorer
 
                 for (int i = 0; i < fileArray.Length; i++)
                 {
-                    if (_indexNumber == i)
+                    if(_indexNumber == i)
                     {
                         Console.BackgroundColor = ConsoleColor.DarkGray;
                         Console.ForegroundColor = ConsoleColor.Black;
-                    }
-                    else
-                    {
-                        Console.BackgroundColor = ConsoleColor.Black;
-                        Console.ForegroundColor = ConsoleColor.White;
-                    }
+                    }                   
 
                     if (File.Exists(fileArray[i]))
                     {
@@ -37,6 +32,10 @@ namespace FileExplorer
                     {
                         Console.WriteLine($"# {Path.GetFileName(fileArray[i])}");
                     }
+
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    Console.ForegroundColor = ConsoleColor.White;
+
                 }
 
                 ConsoleKey input = Console.ReadKey().Key;
